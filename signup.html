@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Signup/Login</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(to bottom right, #6a82fb, #fc5c7d);
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background: white;
+            color: #333;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .logo {
+            width: 150px;
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            margin-bottom: 20px;
+        }
+
+        .form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        input, select {
+            margin-bottom: 15px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+
+        input:focus, select:focus {
+            border-color: #6a82fb;
+            outline: none;
+        }
+
+        .btn {
+            background-color: #fc5c7d;
+            color: white;
+            border: none;
+            padding: 12px;
+            font-size: 1.1em;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        .btn:hover {
+            background-color: #6a82fb;
+            transform: scale(1.05);
+        }
+
+        .teammate-selection {
+            display: none;
+            margin-top: 15px;
+            text-align: left;
+        }
+
+        .teammate-fields {
+            margin-top: 10px;
+        }
+
+        .navigation {
+            margin-top: 20px;
+            display: none; /* Hide initially */
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 30px;
+            }
+
+            h2 {
+                font-size: 1.8em;
+            }
+
+            .btn {
+                padding: 10px;
+                font-size: 1em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <img src="logo.png" alt="Logo" class="logo"> <!-- Replace with your logo image path -->
+        <h2>Signup or Login</h2>
+        <form id="userForm" class="form">
+            <input type="text" id="username" placeholder="Enter your name" required>
+            <input type="password" id="password" placeholder="Enter your password" required>
+            <input type="text" id="projectName" placeholder="Project Name" required>
+            <select id="projectMode" required onchange="toggleTeammateSelection()">
+                <option value="">Select Project Mode</option>
+                <option value="public">Public</option>
+                <option value="private">Private</option>
+            </select>
+            <div class="teammate-selection" id="teammateSelection">
+                <h3>Select Number of Teammates</h3>
+                <input type="number" id="numberOfTeammates" min="1" placeholder="Number of Teammates" oninput="createTeammateFields()" required>
+                <div id="teammateFields" class="teammate-fields"></div>
+            </div>
+            <button type="submit" class="btn">Finalize Team</button>
+        </form>
+        <div class="navigation" id="navigationButtons">
+            <button class="btn" id="goToChatBtn" onclick="goToChat()">Go to Chat</button>
+            <button class="btn" id="goToCompilerBtn" onclick="goToCompiler()">Go to Compiler</button>
+        </div>
+    </div>
+    <script>
+        function toggleTeammateSelection() {
+            const projectMode = document.getElementById('projectMode').value;
+            const teammateSelection = document.getElementById('teammateSelection');
+            const navigationButtons = document.getElementById('navigationButtons');
+            teammateSelection.style.display = projectMode === 'private' ? 'block' : 'none';
+            document.getElementById('teammateFields').innerHTML = ''; // Clear previous fields
+
+            // Show navigation buttons if Public is selected
+            navigationButtons.style.display = projectMode === 'public' ? 'block' : 'none';
+        }
+
+        function createTeammateFields() {
+            const numberOfTeammates = document.getElementById('numberOfTeammates').value;
+            const teammateFields = document.getElementById('teammateFields');
+            teammateFields.innerHTML = ''; // Clear previous fields
+
+            for (let i = 0; i < numberOfTeammates; i++) {
+                const fieldSet = document.createElement('div');
+                fieldSet.innerHTML = `
+                    <h4>Teammate ${i + 1}</h4>
+                    <input type="text" placeholder="Teammate Name" required>
+                    <input type="password" placeholder="Teammate Password" required>
+                `;
+                teammateFields.appendChild(fieldSet);
+            }
+        }
+
+        function goToChat() {
+            window.location.href = 'chat.html'; // Replace with actual chat page
+        }
+
+        function goToCompiler() {
+            window.location.href = 'compiler.html'; // Replace with actual compiler page
+        }
+
+        document.getElementById('userForm').onsubmit = function(e) {
+            e.preventDefault(); // Prevent form submission for demo
+
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const projectName = document.getElementById('projectName').value;
+            const projectMode = document.getElementById('projectMode').value;
+
+            let teammates = [];
+            if (projectMode === 'private') {
+                const teammatesInputs = document.querySelectorAll('#teammateFields > div');
+                teammates = Array.from(teammatesInputs).map(inputSet => {
+                    const name = inputSet.querySelector('input[type="text"]').value;
+                    const pwd = inputSet.querySelector('input[type="password"]').value;
+                    return { name, password: pwd };
+                });
+            }
+
+            // Here you would typically send the data to your server
+            console.log('User Info:', { username, password, projectName, projectMode, teammates });
+            alert(`Team finalized for project: ${projectName}.`);
+
+            // Show navigation buttons after finalizing
+            document.getElementById('navigationButtons').style.display = 'block';
+        };
+    </script>
+</body>
+</html>
